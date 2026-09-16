@@ -31,9 +31,9 @@ const DashboardPage = () => {
     const token = params.get('token');
     if (token) {
       localStorage.setItem('token', token);
-      // Remove token from URL without reloading
       window.history.replaceState({}, '', '/dashboard');
-      fetchUser();
+      // Re-fetch user with new token
+      fetchUser().then(() => loadTasks());
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
