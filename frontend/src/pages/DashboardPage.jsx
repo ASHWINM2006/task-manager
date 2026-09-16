@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import CreateTaskForm from '../components/CreateTaskForm';
 import TaskList from '../components/TaskList';
@@ -17,7 +16,6 @@ const FILTER_STYLES = {
 
 const DashboardPage = () => {
   const { user, fetchUser } = useAuth();
-  const navigate = useNavigate();
   const [tasks, setTasks] = useState([]);
   const [loadingTasks, setLoadingTasks] = useState(true);
   const [creating, setCreating] = useState(false);
@@ -25,18 +23,8 @@ const DashboardPage = () => {
   const [filter, setFilter] = useState('All');
   const [error, setError] = useState('');
 
-  // Handle token from OAuth redirect
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
-    if (token) {
-      localStorage.setItem('token', token);
-      window.history.replaceState({}, '', '/dashboard');
-      // Re-fetch user with new token
-      fetchUser().then(() => loadTasks());
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // AuthCallback already stores token in localStorage before navigating here
+  // No need to read token from URL on dashboard
 
   const loadTasks = useCallback(async () => {
     try {

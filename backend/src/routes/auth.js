@@ -21,18 +21,13 @@ const isGoogleConfigured = () => {
 };
 
 const googleNotConfigured = (_req, res) => {
-  res.status(503).json({
-    message: 'Google OAuth is not configured.',
-  });
+  res.status(503).json({ message: 'Google OAuth is not configured.' });
 };
 
 // @route GET /api/auth/google
 router.get('/google', (req, res, next) => {
   if (!isGoogleConfigured()) return googleNotConfigured(req, res);
-  passport.authenticate('google', {
-    scope: ['profile', 'email'],
-    session: false,
-  })(req, res, next);
+  passport.authenticate('google', { scope: ['profile', 'email'], session: false })(req, res, next);
 });
 
 // @route GET /api/auth/google/callback
@@ -47,18 +42,18 @@ router.get('/google/callback', (req, res, next) => {
 
     const token = generateToken(req.user._id);
     const isProd = process.env.NODE_ENV === 'production';
+    const clientURL = process.env.CLIENT_URL || 'http://localhost:5173';
 
-    // Set httpOnly cookie
+    // Set cookie
     res.cookie('token', token, {
       httpOnly: true,
-      secure: isProd,           // must be true for SameSite=None to work
+      secure: isProd,
       sameSite: isProd ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    // Redirect to frontend with token in URL — React will store it in localStorage
-    const clientURL = process.env.CLIENT_URL || 'http://localhost:5173';
-    res.redirect(`${clientURL}/dashboard?token=${token}`);
+    // Redirect to /auth/callback page with token — dedicated page handles storage
+    res.redirect(`${clientURL}/auth/callback?token=${token}`);
   });
 });
 
