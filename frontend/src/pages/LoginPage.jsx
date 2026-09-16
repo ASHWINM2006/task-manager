@@ -15,7 +15,10 @@ const LoginPage = () => {
   }, [user, loading, navigate]);
 
   const handleGoogleLogin = () => {
-    window.location.href = '/api/auth/google';
+    // In production: redirect to Render backend
+    // In development: Vite proxy handles /api → localhost:5000
+    const apiBase = import.meta.env.VITE_API_URL || '';
+    window.location.href = `${apiBase}/api/auth/google`;
   };
 
   if (loading) {
